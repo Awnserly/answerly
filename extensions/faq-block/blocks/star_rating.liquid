@@ -4,19 +4,38 @@
 
 {% assign accent = block.settings.accent_color %}
 {% assign icon_style = block.settings.icon_style %}
+{% assign divider_style = block.settings.divider_style %}
+{% assign heading_align = block.settings.heading_align %}
+{% assign show_numbers = block.settings.show_numbers %}
 
 {% assign icon_char = "›" %}
 {% if icon_style == "plus" %}{% assign icon_char = "+" %}{% endif %}
-{% if icon_style == "arrow" %}{% assign icon_char = "→" %}{% endif %}
+{% if icon_style == "arrow" %}{% assign icon_char = "▾" %}{% endif %}
+{% if icon_style == "dash" %}{% assign icon_char = "−" %}{% endif %}
 
-<div class="answerly-faqs">
-  <h2 class="answerly-title">{{ block.settings.heading }}</h2>
+<div class="answerly-faqs answerly-divider-{{ divider_style }}">
+  <h2 class="answerly-title" style="text-align: {{ heading_align }};">
+    {{ block.settings.heading }}
+  </h2>
 
   {% for faq in faqs_json %}
-  <div class="answerly-item" style="border: 2px solid {{ accent }};">
-    <button class="answerly-question" onclick="this.parentElement.classList.toggle('open')">
-      <span>{{ faq.q }}</span>
-      <span class="answerly-icon" style="color: {{ accent }};">{{ icon_char }}</span>
+  <div class="answerly-item" style="
+    {% if divider_style == 'bordered' %}border: 2px solid {{ accent }};{% endif %}
+    {% if divider_style == 'card' %}border: 1px solid #e5e7eb; box-shadow: 0 2px 8px rgba(0,0,0,0.06);{% endif %}
+    {% if divider_style == 'minimal' %}border-bottom: 1px solid #e5e7eb;{% endif %}
+    {% if divider_style == 'filled' %}background: {{ accent }}18;{% endif %}
+    {% if divider_style == 'underline' %}border-bottom: 2px solid {{ accent }};{% endif %}
+  ">
+    <button class="answerly-question" onclick="answerlyToggle(this)">
+      <span class="answerly-question-text">
+        {% if show_numbers %}
+          <span class="answerly-num" style="background: {{ accent }}; color: #fff;">{{ forloop.index }}</span>
+        {% endif %}
+        {{ faq.q }}
+      </span>
+      <span class="answerly-icon" style="color: {{ accent }}; border-color: {{ accent }};" data-icon="{{ icon_style }}">
+        {{ icon_char }}
+      </span>
     </button>
     <div class="answerly-answer">
       <p>{{ faq.a }}</p>
@@ -27,24 +46,33 @@
 
 <style>
   .answerly-faqs {
-    max-width: 800px;
-    margin: 2rem auto;
+    max-width: 820px;
+    margin: 2.5rem auto;
     font-family: inherit;
   }
   .answerly-title {
-    font-size: 1.5rem;
+    font-size: 1.6rem;
     font-weight: 700;
-    margin-bottom: 1.25rem;
+    margin-bottom: 1.5rem;
     color: #111;
   }
   .answerly-item {
     border-radius: 12px;
     margin-bottom: 0.75rem;
     overflow: hidden;
-    transition: box-shadow 0.2s;
+    transition: box-shadow 0.2s, transform 0.1s;
+  }
+  .answerly-divider-minimal .answerly-item,
+  .answerly-divider-underline .answerly-item {
+    border-radius: 0;
+    margin-bottom: 0;
   }
   .answerly-item:hover {
-    box-shadow: 0 4px 12px rgba(0,0,0,0.12);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+  }
+  .answerly-divider-minimal .answerly-item:hover,
+  .answerly-divider-underline .answerly-item:hover {
+    box-shadow: none;
   }
   .answerly-question {
     width: 100%;
@@ -52,7 +80,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 1.1rem 1.25rem;
-    background: #fff;
+    background: transparent;
     border: none;
     cursor: pointer;
     font-size: 1rem;
@@ -61,15 +89,60 @@
     text-align: left;
     gap: 1rem;
   }
+  .answerly-divider-card .answerly-question,
+  .answerly-divider-bordered .answerly-question {
+    background: #fff;
+  }
+  .answerly-question-text {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+  }
+  .answerly-num {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    font-size: 0.75rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
   .answerly-icon {
     font-size: 1.4rem;
     font-weight: 700;
     flex-shrink: 0;
     transition: transform 0.3s;
     line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+  }
+  .answerly-icon[data-icon="circle"] {
+    border: 2px solid;
+    border-radius: 50%;
+    font-size: 1rem;
+    width: 28px;
+    height: 28px;
+  }
+  .answerly-icon[data-icon="square"] {
+    border: 2px solid;
+    border-radius: 4px;
+    font-size: 1rem;
+    width: 28px;
+    height: 28px;
   }
   .answerly-item.open .answerly-icon {
     transform: rotate(90deg);
+  }
+  .answerly-item.open .answerly-icon[data-icon="plus"],
+  .answerly-item.open .answerly-icon[data-icon="circle"],
+  .answerly-item.open .answerly-icon[data-icon="square"] {
+    transform: rotate(45deg);
   }
   .answerly-answer {
     max-height: 0;
@@ -78,17 +151,32 @@
     background: #fafafa;
     padding: 0 1.25rem;
   }
+  .answerly-divider-minimal .answerly-answer,
+  .answerly-divider-underline .answerly-answer {
+    background: transparent;
+  }
   .answerly-item.open .answerly-answer {
-    max-height: 300px;
-    padding: 1rem 1.25rem;
+    max-height: 400px;
+    padding: 0.75rem 1.25rem 1.25rem;
   }
   .answerly-answer p {
     margin: 0;
-    color: #444;
-    line-height: 1.7;
+    color: #555;
+    line-height: 1.75;
     font-size: 0.95rem;
   }
 </style>
+
+<script>
+  function answerlyToggle(btn) {
+    var item = btn.parentElement;
+    var isOpen = item.classList.contains('open');
+    var allItems = item.parentElement.querySelectorAll('.answerly-item');
+    allItems.forEach(function(i) { i.classList.remove('open'); });
+    if (!isOpen) item.classList.add('open');
+  }
+</script>
+
 {% endif %}
 
 {% schema %}
@@ -103,10 +191,34 @@
       "default": "Frequently Asked Questions"
     },
     {
+      "type": "select",
+      "id": "heading_align",
+      "label": "Heading alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
       "type": "color",
       "id": "accent_color",
       "label": "Accent color",
       "default": "#6366f1"
+    },
+    {
+      "type": "select",
+      "id": "divider_style",
+      "label": "Divider style",
+      "options": [
+        { "value": "bordered", "label": "Bordered" },
+        { "value": "card", "label": "Card with shadow" },
+        { "value": "minimal", "label": "Minimal lines" },
+        { "value": "filled", "label": "Filled background" },
+        { "value": "underline", "label": "Underline only" }
+      ],
+      "default": "bordered"
     },
     {
       "type": "select",
@@ -115,9 +227,18 @@
       "options": [
         { "value": "chevron", "label": "Chevron ›" },
         { "value": "plus", "label": "Plus +" },
-        { "value": "arrow", "label": "Arrow →" }
+        { "value": "arrow", "label": "Arrow ▾" },
+        { "value": "dash", "label": "Dash −" },
+        { "value": "circle", "label": "Circle +" },
+        { "value": "square", "label": "Square +" }
       ],
       "default": "chevron"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_numbers",
+      "label": "Show question numbers",
+      "default": false
     }
   ]
 }

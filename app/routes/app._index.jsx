@@ -468,7 +468,7 @@ export default function Index() {
       <div style={{ background: "#eef2ff", border: "1px solid #e0e7ff", borderRadius: 16, padding: "1.75rem", textAlign: "center" }}>
         <div style={{ fontSize: "2.2rem", marginBottom: "0.4rem" }}>⭐</div>
         <h3 style={{ margin: "0 0 0.4rem", fontSize: "1.05rem", fontWeight: 700, color: "#111" }}>Enjoying Answerly?</h3>
-        <p style={{ margin: "0 0 1rem", fontSize: "0.85rem", color: "#777" }}>Help other merchants discover the app by leaving a review!</p>
+        <p style={{   margin: "0 0 1rem", fontSize: "0.85rem", color: "#777" }}>Help other merchants discover the app by leaving a review!</p>
         <button
           onClick={() => window.open("https://apps.shopify.com", "_blank")}
           style={{ padding: "0.7rem 1.6rem", background: ACCENT, color: "#fff", borderRadius: 10, fontSize: "0.9rem", fontWeight: 700, border: "none", cursor: "pointer" }}
