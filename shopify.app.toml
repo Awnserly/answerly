@@ -1,5 +1,3 @@
-# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
-
 client_id = "867f455401f2f96272189df5b152f5ec"
 name = "answerly"
 application_url = "https://answerly-080a.onrender.com"
@@ -12,6 +10,10 @@ automatically_update_urls_on_dev = false
 api_version = "2026-07"
 
   [[webhooks.subscriptions]]
+  compliance_topics = ["customers/data_request", "customers/redact", "shop/redact"]
+  uri = "/webhooks/compliance"
+
+  [[webhooks.subscriptions]]
   topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
 
@@ -20,7 +22,6 @@ api_version = "2026-07"
   uri = "/webhooks/app/uninstalled"
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "write_metaobject_definitions,write_metaobjects,write_products"
 
 [auth]
