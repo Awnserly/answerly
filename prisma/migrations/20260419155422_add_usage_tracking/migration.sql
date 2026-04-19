@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "Session" ALTER COLUMN "expires" SET DATA TYPE TIMESTAMP(3),
+ALTER COLUMN "refreshTokenExpires" SET DATA TYPE TIMESTAMP(3);
